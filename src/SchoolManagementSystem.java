@@ -282,7 +282,7 @@ public class SchoolManagementSystem {
 
             if (command.equals("help")) {
                 System.out.println("-".repeat(38) + "Help" + "-".repeat(38));
-                System.out.println("testConnection \n\tTests the database connection");
+                System.out.println("test connection \n\tTests the database connection");
 
                 System.out.println("list students \n\tlists all the students");
                 System.out.println("list classes \n\tlists all the classes");
