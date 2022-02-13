@@ -1,6 +1,10 @@
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -125,8 +129,19 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+        	LocalDate date = LocalDate.parse(birthdate, formatter);
+        	
+        	String sql = String.format("INSERT INTO students(first_name, last_name, birthdate)"
+        			+ "VALUE (%s, %s, %s)",firstName,lastName, date);
+        	
+        	sqlStatement.executeUpdate(sql);
+
+        	sqlStatement.close();
+        	connection.close();
         } catch (SQLException sqlException) {
             System.out.println("Failed to create student");
             System.out.println(sqlException.getMessage());
@@ -199,13 +214,36 @@ public class SchoolManagementSystem {
         }
     }
 
-    public static void listAllClasses() {
+    public static void listAllClasses(){
         Connection connection = null;
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = "SELECT * FROM classes;";
+        	
+        	ResultSet resultSet = sqlStatement.executeQuery(sql);
+        	
+
+        	System.out.println("Class ID | Code | Name | Description");
+        	System.out.println("-".repeat(80));
+        	while(resultSet.next()) {
+        			
+        			int classId = resultSet.getInt("class_id");
+        			String code = resultSet.getString("code");
+        			String name = resultSet.getString("name");
+        			String descript = resultSet.getString("description");
+        			
+        			String res = String.format("%s | %s | %s | %s", classId, code,name, descript);
+        			
+        			System.out.println(res);
+        	}
+        	resultSet.close();
+        	sqlStatement.close();
+        	connection.close();
+            
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
             System.out.println(sqlException.getMessage());
@@ -231,8 +269,30 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = "SELECT * FROM students;";
+        	
+        	ResultSet resultSet = sqlStatement.executeQuery(sql);
+        	
+
+        	System.out.println("Student ID | First Name | Last Name | Birthdate");
+        	System.out.println("-".repeat(80));
+        	while(resultSet.next()) {
+        			
+        			int studentId = resultSet.getInt("student_id");
+        			String firstName = resultSet.getString("first_name");
+        			String lastName = resultSet.getString("last_name");
+        			Date birthDay = resultSet.getDate("birthdate");
+        			
+        			String res = String.format("%s | %s | %s | %s", studentId, firstName,lastName, birthDay);
+        			
+        			System.out.println(res);
+        	}
+        	resultSet.close();
+        	sqlStatement.close();
+        	connection.close();
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
             System.out.println(sqlException.getMessage());
@@ -265,7 +325,7 @@ public class SchoolManagementSystem {
         return commandArguments;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
         System.out.println("Welcome to the School Management System");
         System.out.println("-".repeat(80));
 
@@ -333,5 +393,6 @@ public class SchoolManagementSystem {
         } while (!(command.equals("quit") || command.equals("exit")));
         System.out.println("Bye!");
     }
+
 }
 

@@ -100,4 +100,15 @@ END $$
 
 
 
+select students.first_name,students.last_name, count(class_registrations.student_id)
+from students
+left join class_registrations
+on class_registrations.student_id = students.student_id and students.student_id = 1
+group by students.first_name,students.last_name;
+
+
+select * from class_registrations;
+
+
+
  
