@@ -169,27 +169,6 @@ on instructors.academic_title_id = academic_titles.academic_title_id
 inner join classes
 on class_sections.class_id = classes.class_id;
 
-CREATE FUNCTION convert_to_grade_point(letter_grade char(2))
-returns int 
-deterministic
-BEGIN
-	declare res int;
-	if(letter_grade = 'A') then 
-		set res = 4;
-	elseif(letter_grade = 'B') then
-		set res = 3;
-	elseif(letter_grade = 'C') then
-		set res = 2;
-	elseif(letter_grade = 'D') then
-		set res = 1;
-	elseif(letter_grade = 'F') then
-		set res = 0;
-	elseif(letter_grade = NULL) then
-		set res = NULL;
-	end if;
-	return res;
-END $$
-
 -- Report 7
 select classes.code, classes.name, terms.name, count(class_registrations.student_id) as number_of_student, (classes.maximum_students - count(class_registrations.student_id)) as space_remaining
 from class_registrations
