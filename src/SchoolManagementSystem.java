@@ -22,8 +22,38 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = String.format("select instructors.first_name, instructors.last_name, academic_titles.title, classes.code, classes.name as class_name, terms.name as term\r\n"
+        			+ "from class_sections\r\n"
+        			+ "left join terms\r\n"
+        			+ "on class_sections.term_id = terms.term_id\r\n"
+        			+ "inner join instructors\r\n"
+        			+ "on class_sections.instructor_id = instructors.instructor_id and instructors.first_name = '%s' and instructors.last_name = '%s'\r\n"
+        			+ "inner join academic_titles\r\n"
+        			+ "on instructors.academic_title_id = academic_titles.academic_title_id\r\n"
+        			+ "inner join classes\r\n"
+        			+ "on class_sections.class_id = classes.class_id;", first_name,last_name);
+        	
+        	ResultSet resultSet = sqlStatement.executeQuery(sql);
+        	
+
+        	System.out.println("Firs Name | Last Name | Title | Code | Name | Term");
+        	System.out.println("-".repeat(80));
+        	while(resultSet.next()) {
+        			
+        			String firstName = resultSet.getString("first_name");
+        			String lastName = resultSet.getString("last_name");
+        			String title = resultSet.getString("title");
+        			String code = resultSet.getString("code");
+        			String className = resultSet.getString("class_name");
+        			String term = resultSet.getString("term");
+        			
+        			String res = String.format("%s | %s | %s | %s | %s | %S", firstName, lastName, title , code,className, term);
+        			
+        			System.out.println(res);
+        	}
             
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
@@ -102,8 +132,8 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
         } catch (SQLException sqlException) {
             System.out.println("Failed to delete student");
             System.out.println(sqlException.getMessage());
@@ -139,7 +169,8 @@ public class SchoolManagementSystem {
         			+ "VALUE (%s, %s, %s)",firstName,lastName, date);
         	
         	sqlStatement.executeUpdate(sql);
-
+        	
+        	
         	sqlStatement.close();
         	connection.close();
         } catch (SQLException sqlException) {
@@ -167,8 +198,44 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = "select students.student_id, class_registrations.class_section_id, students.first_name, students.last_name,\r\n"
+        			+ " classes.code, classes.name, terms.name as term,grades.letter_grade\r\n"
+        			+ "from class_registrations\r\n"
+        			+ "left join class_sections\r\n"
+        			+ "on class_registrations.class_section_id = class_sections.class_section_id\r\n"
+        			+ "inner join terms\r\n"
+        			+ "on class_sections.term_id = terms.term_id\r\n"
+        			+ "inner join classes\r\n"
+        			+ "on class_sections.class_id = classes.class_id\r\n"
+        			+ "inner join students\r\n"
+        			+ "on class_registrations.student_id = students.student_id\r\n"
+        			+ "inner join grades\r\n"
+        			+ "on class_registrations.grade_id = grades.grade_id;";
+        	
+        	ResultSet resultSet = sqlStatement.executeQuery(sql);
+        	
+
+        	System.out.println("Student ID | Class Section ID | First Name | Last Name | Code | Name | Term | Letter Grade");
+        	System.out.println("-".repeat(80));
+        	while(resultSet.next()) {
+        		int studentId = resultSet.getInt("student_id");
+    			int classSectionId = resultSet.getInt("class_section_id");
+    			String firstName = resultSet.getString("first_name");
+    			String lastName = resultSet.getString("last_name");
+    			String code = resultSet.getString("code");
+    			String name = resultSet.getString("name");
+    			String term = resultSet.getString("term");
+    			String letterChar = resultSet.getString("letter_grade");
+    			
+    			String res = String.format("%s | %s | %s | %s | %s | %s | %s | %s", studentId, classSectionId,firstName,lastName, 
+    																				code,name, term, letterChar);
+    			
+    			System.out.println(res);
+        	
+        	}
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
@@ -193,8 +260,32 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = "select class_sections.class_section_id, classes.code, classes.name, terms.name as term\r\n"
+        			+ "from class_sections\r\n"
+        			+ "inner join terms\r\n"
+        			+ "on class_sections.term_id = terms.term_id\r\n"
+        			+ "inner join classes\r\n"
+        			+ "on class_sections.class_id = classes.class_id;";
+        	
+        	ResultSet resultSet = sqlStatement.executeQuery(sql);
+        	
+
+        	System.out.println("Class Section ID | Code | Name | term");
+        	System.out.println("-".repeat(80));
+        	while(resultSet.next()) {
+        			
+        			int classSectionId = resultSet.getInt("class_section_id");
+        			String code = resultSet.getString("code");
+        			String name = resultSet.getString("name");
+        			String term = resultSet.getString("term");
+        			
+        			String res = String.format("%s | %s | %s | %s", classSectionId, code,name, term);
+        			
+        			System.out.println(res);
+        	}
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
