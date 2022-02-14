@@ -135,16 +135,72 @@ group by classes.code, classes.name;
 select classes.code, classes.name, terms.name, count(class_registrations.grade_id) as number_of_grades, 
 sum(convert_to_grade_point(grades.letter_grade)) as total_grade_points_earned, (sum(convert_to_grade_point(grades.letter_grade)) / count(class_registrations.grade_id) ) as GPA
 from class_registrations
-inner join class_sections
+left join class_sections
 on class_registrations.class_section_id = class_sections.class_section_id
-right join classes
-on class_sections.class_id = classes.class_id
 inner join terms
 on class_sections.term_id = terms.term_id
-inner join grades
-on class_registrations.grade_id = grades.grade_id and class_registrations.class_section_id = class_sections.class_section_id
+left join grades
+on class_registrations.grade_id = grades.grade_id 
+inner join classes
+on class_sections.class_id = classes.class_id
 group by classes.code, classes.name,terms.name;
 
-select * from class_registrations;
-select * from class_sections;
-select * from terms;
+-- Report 5
+select instructors.first_name, instructors.last_name, academic_titles.title, classes.code, classes.name as class_name, terms.name as term
+from class_sections
+left join terms
+on class_sections.term_id = terms.term_id
+inner join instructors
+on class_sections.instructor_id = instructors.instructor_id and instructors.instructor_id = 1
+inner join academic_titles
+on instructors.academic_title_id = academic_titles.academic_title_id
+inner join classes
+on class_sections.class_id = classes.class_id;
+
+-- Report 6
+select instructors.first_name, instructors.last_name, academic_titles.title, classes.code, classes.name as class_name, terms.name as term
+from class_sections
+left join terms
+on class_sections.term_id = terms.term_id
+inner join instructors
+on class_sections.instructor_id = instructors.instructor_id 
+inner join academic_titles
+on instructors.academic_title_id = academic_titles.academic_title_id
+inner join classes
+on class_sections.class_id = classes.class_id;
+
+CREATE FUNCTION convert_to_grade_point(letter_grade char(2))
+returns int 
+deterministic
+BEGIN
+	declare res int;
+	if(letter_grade = 'A') then 
+		set res = 4;
+	elseif(letter_grade = 'B') then
+		set res = 3;
+	elseif(letter_grade = 'C') then
+		set res = 2;
+	elseif(letter_grade = 'D') then
+		set res = 1;
+	elseif(letter_grade = 'F') then
+		set res = 0;
+	elseif(letter_grade = NULL) then
+		set res = NULL;
+	end if;
+	return res;
+END $$
+
+-- Report 7
+select classes.code, classes.name, terms.name, count(class_registrations.student_id) as number_of_student, (classes.maximum_students - count(class_registrations.student_id)) as space_remaining
+from class_registrations
+left join class_sections
+on class_registrations.class_section_id = class_sections.class_section_id
+inner join terms
+on class_sections.term_id = terms.term_id
+left join grades
+on class_registrations.grade_id = grades.grade_id 
+inner join classes
+on class_sections.class_id = classes.class_id
+group by classes.code, classes.name,terms.name, classes.maximum_students;
+
+
