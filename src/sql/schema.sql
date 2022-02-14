@@ -99,16 +99,52 @@ BEGIN
 END $$
 
 
-
-select students.first_name,students.last_name, count(class_registrations.student_id)
-from students
-left join class_registrations
+-- Report 1
+select students.first_name,students.last_name, count(class_registrations.student_id) as number_of_classes, 
+sum(convert_to_grade_point(grades.letter_grade)) as total_grade_points_earned, (sum(convert_to_grade_point(grades.letter_grade)) / count(class_registrations.student_id)) as GPA
+from class_registrations
+inner join students
 on class_registrations.student_id = students.student_id and students.student_id = 1
+inner join grades
+on class_registrations.grade_id = grades.grade_id and class_registrations.student_id = students.student_id
 group by students.first_name,students.last_name;
 
+-- Report 2
+select students.first_name,students.last_name, count(class_registrations.student_id) as number_of_classes, 
+sum(convert_to_grade_point(grades.letter_grade)) as total_grade_points_earned, (sum(convert_to_grade_point(grades.letter_grade)) / count(class_registrations.student_id)) as GPA
+from class_registrations
+inner join students
+on class_registrations.student_id = students.student_id
+inner join grades
+on class_registrations.grade_id = grades.grade_id and class_registrations.student_id = students.student_id
+group by students.first_name,students.last_name;
+
+-- Report 3
+select classes.code, classes.name, count(class_registrations.grade_id) as number_of_grades, 
+sum(convert_to_grade_point(grades.letter_grade)) as total_grade_points_earned, (sum(convert_to_grade_point(grades.letter_grade)) / count(class_registrations.grade_id) ) as GPA
+from class_registrations
+inner join class_sections
+on class_registrations.class_section_id = class_sections.class_section_id
+inner join classes
+on class_sections.class_id = classes.class_id
+inner join grades
+on class_registrations.grade_id = grades.grade_id and class_registrations.class_section_id = class_sections.class_section_id
+group by classes.code, classes.name;
+
+-- Report 4
+select classes.code, classes.name, terms.name, count(class_registrations.grade_id) as number_of_grades, 
+sum(convert_to_grade_point(grades.letter_grade)) as total_grade_points_earned, (sum(convert_to_grade_point(grades.letter_grade)) / count(class_registrations.grade_id) ) as GPA
+from class_registrations
+inner join class_sections
+on class_registrations.class_section_id = class_sections.class_section_id
+right join classes
+on class_sections.class_id = classes.class_id
+inner join terms
+on class_sections.term_id = terms.term_id
+inner join grades
+on class_registrations.grade_id = grades.grade_id and class_registrations.class_section_id = class_sections.class_section_id
+group by classes.code, classes.name,terms.name;
 
 select * from class_registrations;
-
-
-
- 
+select * from class_sections;
+select * from terms;
