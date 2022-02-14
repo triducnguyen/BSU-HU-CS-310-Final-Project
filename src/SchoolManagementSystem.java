@@ -106,8 +106,13 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+        	sqlStatement = connection.createStatement();
+        	
+        	String sql = String.format("insert into class_registrations(student_id, class_section_id)\r\n"
+        			+ "values(%s,%s);",studentId,classSectionID);
+        	
+        	ResultSet rs = sqlStatement.executeQuery(sql);
         } catch (SQLException sqlException) {
             System.out.println("Failed to register student");
             System.out.println(sqlException.getMessage());
@@ -134,6 +139,12 @@ public class SchoolManagementSystem {
         try {
         	connection = Database.getDatabaseConnection();
         	sqlStatement = connection.createStatement();
+        	
+        	String sql = String.format("SET SQL_SAFE_UPDATES = 0;"
+        			+ "delete from students where students.student_id = %s;", studentId);
+        	
+        	sqlStatement.executeUpdate(sql);
+        	
         } catch (SQLException sqlException) {
             System.out.println("Failed to delete student");
             System.out.println(sqlException.getMessage());
